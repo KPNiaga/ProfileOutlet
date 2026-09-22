@@ -526,7 +526,7 @@
                 badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span> ${coopDatabase.length} Koperasi Sedia`;
             }
 
-            // Populate Officer Dropdown dynamically from Col B
+            // Populate Officer Dropdown dynamically from Col B without external/optgroup wrappers
             populatePegawaiDropdown(Array.from(uniqueOfficersSet).sort());
 
             document.getElementById('totalCoopsCount').innerText = coopDatabase.length;
@@ -544,21 +544,11 @@
                 select.appendChild(opt);
             });
 
-            // Add manual & external options at bottom
-            const group = document.createElement('optgroup');
-            group.label = "Pilihan Lain";
-
-            const optExt = document.createElement('option');
-            optExt.value = "Pengguna Luar / Wakil Koperasi";
-            optExt.textContent = "Pengguna Luar / Wakil Koperasi";
-            group.appendChild(optExt);
-
+            // Add manual option directly at the bottom without optgroup or external user option
             const optManual = document.createElement('option');
             optManual.value = "Lain-lain / Pendaftar Baru";
             optManual.textContent = "-- Masukkan Nama Secara Manual --";
-            group.appendChild(optManual);
-
-            select.appendChild(group);
+            select.appendChild(optManual);
         }
 
         function filterKoperasiList() {
@@ -566,7 +556,7 @@
             const currentPegawai = document.getElementById('userName').value;
 
             let baseList = coopDatabase;
-            if (currentPegawai && currentPegawai !== "Lain-lain / Pendaftar Baru" && currentPegawai !== "Pengguna Luar / Wakil Koperasi") {
+            if (currentPegawai && currentPegawai !== "Lain-lain / Pendaftar Baru") {
                 baseList = coopDatabase.filter(c => c.pegawai === currentPegawai);
             }
 
@@ -591,12 +581,12 @@
             }
 
             // Reset selected coop if it doesn't belong to newly selected officer
-            if (selectedCoop && selectedCoop.pegawai !== val && val !== "Lain-lain / Pendaftar Baru" && val !== "Pengguna Luar / Wakil Koperasi") {
+            if (selectedCoop && selectedCoop.pegawai !== val && val !== "Lain-lain / Pendaftar Baru") {
                 clearKoperasiSelection();
             }
 
             let filteredList = coopDatabase;
-            if (val && val !== "Lain-lain / Pendaftar Baru" && val !== "Pengguna Luar / Wakil Koperasi") {
+            if (val && val !== "Lain-lain / Pendaftar Baru") {
                 filteredList = coopDatabase.filter(c => c.pegawai === val);
             }
 
@@ -688,7 +678,6 @@
         }
 
         function renderContactDetails(c) {
-            // 1. Phones (BA100 & SKA)
             const phoneBox = document.getElementById('phoneDisplay');
             phoneBox.innerHTML = `
                 <div class="grid grid-cols-1 gap-1">
@@ -697,7 +686,6 @@
                 </div>
             `;
 
-            // 2. Status & Remark
             const statusBox = document.getElementById('statusRemarkDisplay');
             statusBox.innerHTML = `
                 <div><strong class="text-slate-800">Status Sumber:</strong> <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">${c.status || '-'}</span></div>
@@ -705,7 +693,6 @@
                 <div class="mt-1 text-[11px] text-slate-500"><strong>Pegawai Disertakan:</strong> ${c.pegawai || '-'}</div>
             `;
 
-            // 3. Leadership & Office Bearers Grid
             const leadersBox = document.getElementById('leadershipDisplay');
             leadersBox.innerHTML = `
                 <div class="p-2 bg-white border border-slate-200 rounded-lg">
@@ -858,7 +845,7 @@
                 fetch(googleWebAppUrl, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(submissionRecord)
                 })
                 .then(() => finalizeSubmission(submissionRecord, true))
